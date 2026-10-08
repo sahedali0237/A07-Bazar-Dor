@@ -16,7 +16,7 @@ const NavList = async () => {
     const res = await fetch(
       "https://api.abcz.workers.dev/api/bazardor/categories",
       {
-        cache: "no-cache",
+        cache: "no-store",
       },
     );
 
@@ -36,13 +36,13 @@ const NavList = async () => {
   }
 
   return (
-    <nav className="flex items-center justify-center w-full py-4 bg-white border-b overflow-x-auto">
+    <nav className="flex w-full items-center justify-center overflow-x-auto border-b bg-white py-4">
       <ul className="flex items-center gap-6 px-4">
         {data.map((n) => (
           <li key={n.id}>
             <Link
-              href={`/category/${n.slug}`}
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-black whitespace-nowrap"
+              href={`/${n.slug}`}
+              className="flex items-center gap-2 whitespace-nowrap text-sm font-medium text-gray-700 hover:text-black"
             >
               {n.icon && <span className="text-lg">{n.icon}</span>}
 

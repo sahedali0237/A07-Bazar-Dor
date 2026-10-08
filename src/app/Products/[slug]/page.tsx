@@ -9,7 +9,12 @@ export const MetaData = async ({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> => {
   const { slug } = await params;
-  const res = await fetch("https://api.abcz.workers.dev/api/bazardor/products");
+  const res = await fetch(
+    "https://api.abcz.workers.dev/api/bazardor/products",
+    {
+      cache: "no-store",
+    },
+  );
 
   if (!res.ok) return { title: "Error" };
 
