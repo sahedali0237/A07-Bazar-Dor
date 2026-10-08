@@ -16,7 +16,7 @@ const NavList = async () => {
     const res = await fetch(
       "https://api.api-store.workers.dev/api/bazardor/categories",
       {
-        cache: "no-cache", // Caches data for 1 hour
+        cache: "no-cache",
       },
     );
 

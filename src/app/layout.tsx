@@ -5,6 +5,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import HeaderSection from "./components/header/page";
 import NavList from "./components/Nav/page";
+import MarqueeSection from "./components/marque/page";
 
 const notoSerifBengali = Noto_Serif_Bengali({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={<div className="p-4">Loading...</div>}>
           <HeaderSection />
           <NavList />
+          <MarqueeSection />
         </Suspense>
         <>{children}</>
         <ToastContainer />
