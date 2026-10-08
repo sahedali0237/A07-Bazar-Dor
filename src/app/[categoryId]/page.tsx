@@ -38,7 +38,7 @@ const CategoryPage = async ({ params, searchParams }: PageProps) => {
   const res = await fetch(
     `https://api.abcz.workers.dev/api/bazardor/products?category=${categoryId}`,
     {
-      cache: "no-store",
+      next: { revalidate: 10 },
     },
   );
 

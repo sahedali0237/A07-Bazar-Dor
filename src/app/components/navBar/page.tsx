@@ -16,7 +16,7 @@ const NavList = async () => {
     const res = await fetch(
       "https://api.abcz.workers.dev/api/bazardor/categories",
       {
-        cache: "no-store",
+        next: { revalidate: 10 },
       },
     );
 

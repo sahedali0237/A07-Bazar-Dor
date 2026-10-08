@@ -1,7 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import CurrentDate from "./currentDate";
+import React, { Suspense } from "react";
+// import CurrentDate from "./currentDate";
+
+import { connection } from "next/server";
+
+const CurrentDate = async () => {
+  await connection();
+
+  const date = new Date().toLocaleDateString("bn-BD", {
+    dateStyle: "full",
+    timeZone: "Asia/Dhaka",
+  });
+
+  return <p className="mt-1 min-h-6 font-bold text-black">{date}</p>;
+};
 
 const HeaderSection = () => {
   return (
@@ -21,7 +34,9 @@ const HeaderSection = () => {
               <h1 className="text-lg font-bold text-black">বাজার দর</h1>
 
               <div className="text-sm text-gray-600">
-                <CurrentDate />
+                <Suspense fallback={<p></p>}>
+                  <CurrentDate />
+                </Suspense>
               </div>
             </div>
           </div>
