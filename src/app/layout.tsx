@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Noto_Serif_Bengali } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import HeaderSection from "./components/header/page";
+import NavList from "./components/Nav/page";
 
 const notoSerifBengali = Noto_Serif_Bengali({
   variable: "--font-geist-sans",
@@ -21,11 +23,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${notoSerifBengali.variable} h-full antialiased`}
+      className={`${notoSerifBengali.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <HeaderSection />
-        <main>{children}</main>
+      <body className="min-h-full flex flex-col bg-color-white">
+        <Suspense fallback={<div className="p-4">Loading...</div>}>
+          <HeaderSection />
+          <NavList />
+        </Suspense>
+        <>{children}</>
         <ToastContainer />
       </body>
     </html>

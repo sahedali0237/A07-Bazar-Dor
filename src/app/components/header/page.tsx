@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -7,6 +8,7 @@ const HeaderSection = () => {
   const date = new Date().toLocaleDateString("bn-BD", {
     dateStyle: "full",
   });
+
   return (
     <div className="flex justify-between items-center p-4 bg-gray-100">
       <Link href="/">
@@ -18,6 +20,7 @@ const HeaderSection = () => {
             alt="Logo"
             className="h-8 w-8 mr-2"
           />
+
           <div className="flex flex-col">
             <h1 className="text-lg font-bold text-black">বাজার দর</h1>
 
@@ -30,6 +33,7 @@ const HeaderSection = () => {
         <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
           Sign In
         </button>
+
         <button className="bg-green-500 text-white px-4 py-2 rounded-md">
           Sign Up
         </button>
