@@ -1,13 +1,26 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { Product, Market } from "@/types/page";
 
-export const MetaData = async ({
+export async function generateStaticParams() {
+  const res = await fetch("https://api.abcz.workers.dev/api/bazardor/products");
+
+  if (!res.ok) return [];
+
+  const products: Product[] = await res.json();
+
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> => {
+}): Promise<Metadata> {
   const { slug } = await params;
   const res = await fetch(
     "https://api.abcz.workers.dev/api/bazardor/products",
@@ -33,14 +46,14 @@ export const MetaData = async ({
           : "অপরিবর্তিত আছে"
     }।`,
   };
-};
+}
 
-// 2. Details Page Component
-const DetailsPage = async ({
+// 1. Extracted the data fetching and rendering into a separate async component
+async function ProductDetails({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) => {
+}) {
   const { slug } = await params;
 
   const res = await fetch(
@@ -61,7 +74,9 @@ const DetailsPage = async ({
     notFound();
   }
 
-  const priceDiff = Math.abs(data.today - data.yesterday);
+  const priceDiff = Math.abs(
+    Number(data.today) - Number(data.yesterday || data.today),
+  );
 
   const diffText =
     data.change.dir === "up"
@@ -80,18 +95,21 @@ const DetailsPage = async ({
   const changeIcon =
     data.change.dir === "up" ? "▲" : data.change.dir === "down" ? "▼" : "—";
 
-  const allMins: number[] = data.markets.map((market: Market) => market.min);
-  const allMaxs: number[] = data.markets.map((market: Market) => market.max);
+  const allMins: number[] =
+    data.markets?.map((market: Market) => market.min) || [];
+  const allMaxs: number[] =
+    data.markets?.map((market: Market) => market.max) || [];
 
-  const globalMin = Math.min(...allMins);
-  const globalMax = Math.max(...allMaxs);
+  const globalMin = allMins.length > 0 ? Math.min(...allMins) : data.today;
+  const globalMax = allMaxs.length > 0 ? Math.max(...allMaxs) : data.today;
 
-  const rowAverages: number[] = data.markets.map(
-    (market: Market) => (market.min + market.max) / 2,
-  );
+  const rowAverages: number[] =
+    data.markets?.map((market: Market) => (market.min + market.max) / 2) || [];
 
   const totalAvg: number =
-    rowAverages.reduce((acc, value) => acc + value, 0) / rowAverages.length;
+    rowAverages.length > 0
+      ? rowAverages.reduce((acc, value) => acc + value, 0) / rowAverages.length
+      : Number(data.today);
 
   const formattedAvg: string | number = Number.isInteger(totalAvg)
     ? totalAvg
@@ -107,112 +125,104 @@ const DetailsPage = async ({
   const unit = unitMap[data.unit] || data.unit;
 
   return (
-    <main className="min-h-screen bg-[#f4f7f5] px-4 py-8 text-gray-800 md:px-8">
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* Breadcrumb Section */}
-        <nav className="text-sm font-medium text-gray-600">
-          <Link href="/" className="hover:text-gray-900">
-            হোম
-          </Link>
-          <span className="mx-2">&gt;</span>
-          <span>{data.categoryNameBn}</span>
-          <span className="mx-2">&gt;</span>
-          <span className="text-gray-900">{data.nameBn}</span>
-        </nav>
+    <div className="mx-auto max-w-6xl space-y-8">
+      {/* Breadcrumb Section */}
+      <nav className="text-sm font-medium text-gray-600">
+        <Link href="/" className="hover:text-gray-900">
+          হোম
+        </Link>
+        <span className="mx-2">&gt;</span>
+        <span>{data.categoryNameBn}</span>
+        <span className="mx-2">&gt;</span>
+        <span className="text-gray-900">{data.nameBn}</span>
+      </nav>
 
-        {/* Main Header Card */}
-        <div className="flex flex-col justify-between gap-6 rounded-2xl bg-white p-6 md:p-8 shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:flex-row md:items-center">
-          <div className="flex items-center gap-5 md:gap-6">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#f4f7f5] text-4xl shadow-inner">
-              {data.image}
-            </div>
-
-            <div>
-              <h1 className="mb-2 text-2xl font-bold text-gray-900 md:text-3xl">
-                {data.nameBn}
-              </h1>
-
-              <p className="mb-2 text-sm text-gray-500">
-                প্রতি {unit} - {data.categoryNameBn}
-              </p>
-
-              <p className="text-sm font-medium text-gray-600">
-                গতকালের তুলনায় আজ দাম{" "}
-                <span className="font-bold text-gray-900">{diffText}</span>
-                {data.change.dir !== "flat" && (
-                  <>
-                    {" - "}
-                    {priceDiff} টাকা
-                  </>
-                )}
-              </p>
-            </div>
+      {/* Main Header Card */}
+      <div className="flex flex-col justify-between gap-6 rounded-2xl bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:flex-row md:items-center md:p-8">
+        <div className="flex items-center gap-5 md:gap-6">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#f4f7f5] text-4xl shadow-inner">
+            {data.image}
           </div>
 
-          <div className="min-w-40 shrink-0 rounded-xl bg-[#f4f7f5] p-5 text-center">
-            <p className="mb-2 text-xs font-semibold text-gray-500">
-              আজকের দাম
+          <div>
+            <h1 className="mb-2 text-2xl font-bold text-gray-900 md:text-3xl">
+              {data.nameBn}
+            </h1>
+
+            <p className="mb-2 text-sm text-gray-500">
+              প্রতি {unit} - {data.categoryNameBn}
             </p>
 
-            <div className="mb-1 text-4xl font-bold text-gray-900">
-              {data.today}
-            </div>
-
-            <p className="mb-2 text-xs text-gray-500">টাকা / {unit}</p>
-
-            <div className={`text-xs font-bold ${changeColorClass}`}>
-              {changeIcon} {data.change.pct}%
-            </div>
+            <p className="text-sm font-medium text-gray-600">
+              গতকালের তুলনায় আজ দাম{" "}
+              <span className="font-bold text-gray-900">{diffText}</span>
+              {data.change.dir !== "flat" && (
+                <>
+                  {" - "}
+                  {priceDiff} টাকা
+                </>
+              )}
+            </p>
           </div>
         </div>
 
-        {/* Price Summary Section */}
-        <section className="pt-2">
-          <h2 className="mb-4 text-xl font-bold text-gray-800">
-            দামের সারসংক্ষেপ
-          </h2>
+        <div className="min-w-40 shrink-0 rounded-xl bg-[#f4f7f5] p-5 text-center">
+          <p className="mb-2 text-xs font-semibold text-gray-500">আজকের দাম</p>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-              <p className="mb-2 text-sm font-medium text-gray-500">
-                সর্বনিম্ন দাম
-              </p>
-              <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#00a651]">
-                {globalMin}
-                <span className="text-base font-normal text-gray-500">
-                  টাকা
-                </span>
-              </div>
-              <p className="text-xs text-gray-400">সবচেয়ে কম দামের বাজার</p>
-            </div>
-
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-              <p className="mb-2 text-sm font-medium text-gray-500">
-                সর্বাধিক দাম
-              </p>
-              <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#ed1c24]">
-                {globalMax}
-                <span className="text-base font-normal text-gray-500">
-                  টাকা
-                </span>
-              </div>
-              <p className="text-xs text-gray-400">সবচেয়ে বেশি দামের বাজার</p>
-            </div>
-
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-              <p className="mb-2 text-sm font-medium text-gray-500">গড় দাম</p>
-              <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#00a651]">
-                {formattedAvg}
-                <span className="text-base font-normal text-gray-500">
-                  টাকা
-                </span>
-              </div>
-              <p className="text-xs text-gray-400">প্রতি {unit}-এর হিসাবে</p>
-            </div>
+          <div className="mb-1 text-4xl font-bold text-gray-900">
+            {data.today}
           </div>
-        </section>
 
-        {/* Market Based Price Table */}
+          <p className="mb-2 text-xs text-gray-500">টাকা / {unit}</p>
+
+          <div className={`text-xs font-bold ${changeColorClass}`}>
+            {changeIcon} {data.change.pct}%
+          </div>
+        </div>
+      </div>
+
+      {/* Price Summary Section */}
+      <section className="pt-2">
+        <h2 className="mb-4 text-xl font-bold text-gray-800">
+          দামের সারসংক্ষেপ
+        </h2>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <p className="mb-2 text-sm font-medium text-gray-500">
+              সর্বনিম্ন দাম
+            </p>
+            <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#00a651]">
+              {globalMin}
+              <span className="text-base font-normal text-gray-500">টাকা</span>
+            </div>
+            <p className="text-xs text-gray-400">সবচেয়ে কম দামের বাজার</p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <p className="mb-2 text-sm font-medium text-gray-500">
+              সর্বাধিক দাম
+            </p>
+            <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#ed1c24]">
+              {globalMax}
+              <span className="text-base font-normal text-gray-500">টাকা</span>
+            </div>
+            <p className="text-xs text-gray-400">সবচেয়ে বেশি দামের বাজার</p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+            <p className="mb-2 text-sm font-medium text-gray-500">গড় দাম</p>
+            <div className="mb-2 flex items-baseline gap-1 text-3xl font-bold text-[#00a651]">
+              {formattedAvg}
+              <span className="text-base font-normal text-gray-500">টাকা</span>
+            </div>
+            <p className="text-xs text-gray-400">প্রতি {unit}-এর হিসাবে</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Market Based Price Table */}
+      {data.markets && data.markets.length > 0 && (
         <section className="pt-4 pb-12">
           <h2 className="mb-4 text-xl font-bold text-gray-800">
             বাজারভিত্তিক আজকের দাম
@@ -276,9 +286,28 @@ const DetailsPage = async ({
             </div>
           </div>
         </section>
-      </div>
+      )}
+    </div>
+  );
+}
+
+// 2. The main page now wraps everything in Suspense
+export default function DetailsPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  return (
+    <main className="min-h-screen bg-[#f4f7f5] px-4 py-8 text-gray-800 md:px-8">
+      <Suspense
+        fallback={
+          <div className="flex h-[50vh] items-center justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-800"></div>
+          </div>
+        }
+      >
+        <ProductDetails params={params} />
+      </Suspense>
     </main>
   );
-};
-
-export default DetailsPage;
+}

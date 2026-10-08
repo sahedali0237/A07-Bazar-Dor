@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-const SortDropdown = () => {
+const SortDropdownContent = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -42,6 +43,18 @@ const SortDropdown = () => {
         <option value="price-desc">Price: High to Low</option>
       </select>
     </div>
+  );
+};
+
+const SortDropdown = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="h-9 w-32 animate-pulse rounded-lg bg-gray-100"></div>
+      }
+    >
+      <SortDropdownContent />
+    </Suspense>
   );
 };
 

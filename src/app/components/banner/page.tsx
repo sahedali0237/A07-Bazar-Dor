@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-// import CurrentDate from "./currentDate";
 
 import { connection } from "next/server";
 import { Suspense } from "react";
