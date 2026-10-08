@@ -1,7 +1,7 @@
 import Banner from "./components/banner/page";
-import AllProducts from "./incised/allProduct";
-import DownProducts from "./incised/downProduct";
-import UpProducts from "./incised/upProduct";
+import AllProducts from "./Products/allProduct";
+import DownProducts from "./Products/downProduct";
+import UpProducts from "./Products/upProduct";
 
 const page = async () => {
   const res = await fetch(
