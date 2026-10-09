@@ -10,6 +10,12 @@ const SocialProvider = () => {
       provider: "google",
     });
   };
+  const handelProviderGitHub = async () => {
+    await authClient.signIn.social({
+      provider: "github",
+    });
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <button
@@ -23,6 +29,7 @@ const SocialProvider = () => {
 
       <div className="flex gap-4">
         <button
+          onClick={handelProviderGitHub}
           type="button"
           className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
         >
