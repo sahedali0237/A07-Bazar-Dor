@@ -12,11 +12,13 @@ const SocialProvider = () => {
       provider: "google",
     });
   };
+
   const handelProviderGitHub = async () => {
     await authClient.signIn.social({
       provider: "github",
     });
   };
+
   const handelProviderDiscord = async () => {
     await authClient.signIn.social({
       provider: "discord",
@@ -31,7 +33,7 @@ const SocialProvider = () => {
         className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
       >
         <FcGoogle size={18} />
-        Google দিয়ে চালিয়ে যান
+        Google দিয়ে চালিয়ে যান
       </button>
 
       <div className="flex gap-4">
