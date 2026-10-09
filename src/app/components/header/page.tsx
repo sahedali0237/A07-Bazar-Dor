@@ -41,15 +41,21 @@ const HeaderSection = () => {
           </div>
         </Link>
 
-        <div className="flex gap-1.5">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-            Sign In
-          </button>
+        <div className="flex items-center gap-3">
+  <Link
+    href="/signIn"
+    className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition duration-300 hover:border-blue-600 hover:text-blue-600"
+  >
+    Sign In
+  </Link>
 
-          <button className="bg-green-500 text-white px-4 py-2 rounded-md">
-            Sign Up
-          </button>
-        </div>
+  <Link
+    href="/signUp"
+    className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-300 hover:bg-blue-700 hover:shadow-md"
+  >
+    Sign Up
+  </Link>
+</div>
       </div>
     </header>
   );
