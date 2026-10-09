@@ -4,17 +4,28 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 import { Product, Market } from "@/types/page";
 
-export async function generateStaticParams() {
-  const res = await fetch("https://api.abcz.workers.dev/api/bazardor/products");
+const fetchProducts = async (): Promise<Product[]> => {
+  try {
+    const res = await fetch(
+      "https://api.api-store.workers.dev/api/bazardor/products",
+      {
+        next: { revalidate: 10 },
+      },
+    );
 
-  if (!res.ok) return [];
+    if (!res.ok) return [];
 
-  const products: Product[] = await res.json();
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return [];
+    }
 
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
-}
+    const products: Product[] = await res.json();
+    return Array.isArray(products) ? products : [];
+  } catch (error) {
+    return [];
+  }
+};
 
 export async function generateMetadata({
   params,
@@ -23,7 +34,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const res = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/products",
+    "https://api.api-store.workers.dev/api/bazardor/products",
     {
       next: { revalidate: 10 },
     },
@@ -57,7 +68,7 @@ async function ProductDetails({
   const { slug } = await params;
 
   const res = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/products",
+    "https://api.api-store.workers.dev/api/bazardor/products",
     {
       next: { revalidate: 10 },
     },

@@ -37,7 +37,7 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
   const { sort } = await searchParams;
 
   const res = await fetch(
-    `https://api.abcz.workers.dev/api/bazardor/products?category=${categoryId}`,
+    `https://api.api-store.workers.dev/api/bazardor/products?category=${categoryId}`,
     {
       next: { revalidate: 10 },
     },
@@ -196,11 +196,9 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
   );
 };
 
-// 2. The main exported page provides the layout and wraps the dynamic part in Suspense
 const CategoryPage = ({ params, searchParams }: PageProps) => {
   return (
     <main className="min-h-screen bg-[#f4f6f4] px-4 py-6 md:px-6 lg:px-8">
-      {/* We pass the promises down and display a loading indicator while it fetches/calculates */}
       <Suspense
         fallback={
           <div className="flex h-[50vh] items-center justify-center">

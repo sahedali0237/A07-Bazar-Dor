@@ -1,8 +1,9 @@
 import React from "react";
+
 import { authClient } from "@/lib/auth-client";
-import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { FiGithub } from "react-icons/fi";
+import { BsDiscord } from "react-icons/bs";
 
 const SocialProvider = () => {
   const handelProviderGoogle = async () => {
@@ -13,6 +14,11 @@ const SocialProvider = () => {
   const handelProviderGitHub = async () => {
     await authClient.signIn.social({
       provider: "github",
+    });
+  };
+  const handelProviderDiscord = async () => {
+    await authClient.signIn.social({
+      provider: "discord",
     });
   };
 
@@ -38,11 +44,12 @@ const SocialProvider = () => {
         </button>
 
         <button
+          onClick={handelProviderDiscord}
           type="button"
           className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
         >
-          <FaFacebook size={18} color="#1877F2" />
-          Facebook
+          <BsDiscord size={18} color="#1877F2" />
+          Discord
         </button>
       </div>
     </div>
