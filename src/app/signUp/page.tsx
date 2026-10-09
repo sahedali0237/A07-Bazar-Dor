@@ -1,12 +1,49 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiEye, FiEyeOff, FiGithub } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
+import React, { useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import SocialProvider from "../components/socialprovider/page";
 
 export default function SignupPage() {
+  const router = useRouter();
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const user = Object.fromEntries(formData.entries()) as Record<
+      string,
+      string
+    >;
+
+    if (user.password !== user.confirmPassword) {
+      toast.error("পাসওয়ার্ড দুটি মিলছে না।");
+      return;
+    }
+
+    const { data, error } = await authClient.signUp.email({
+      email: user.email,
+      name: user.name,
+      password: user.password,
+      callbackURL: "/",
+    });
+
+    if (data) {
+      toast.success("অ্যাকাউন্ট তৈরি হয়েছে!");
+      router.push("/");
+    }
+    if (error) {
+      const message =
+        typeof error === "string"
+          ? error
+          : error?.message || "সাইন আপ করতে সমস্যা হয়েছে।";
+      toast.error(message);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -22,12 +59,7 @@ export default function SignupPage() {
       </div>
 
       <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <form className="space-y-4" onSubmit={onSubmit}>
           <div>
             <label
               className="mb-1.5 block text-sm font-medium text-gray-800"
@@ -144,38 +176,15 @@ export default function SignupPage() {
           <div className="grow border-t border-gray-200" />
         </div>
 
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-          >
-            <FcGoogle size={18} />
-            Google দিয়ে চালিয়ে যান
-          </button>
-
-          <div className="flex gap-4">
-            <button
-              type="button"
-              className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-            >
-              <FiGithub size={18} />
-              GitHub
-            </button>
-
-            <button
-              type="button"
-              className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-            >
-              <FaFacebook size={18} color="#1877F2" />
-              Facebook
-            </button>
-          </div>
+        <div>
+          <SocialProvider />
         </div>
 
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             অ্যাকাউন্ট আছে?{" "}
             <Link
+              type="submit"
               href="/signIn"
               className="font-medium text-[#108a3d] hover:underline"
             >

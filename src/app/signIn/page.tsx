@@ -1,14 +1,43 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiEye, FiEyeOff, FiGithub } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
 import Link from "next/link";
+import React, { useState } from "react";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
+import { authClient } from "@/lib/auth-client";
+import SocialProvider from "../components/socialprovider/page";
 
 export default function LoginPage() {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const user = Object.fromEntries(formData.entries()) as Record<
+      string,
+      string
+    >;
+
+    const { data, error } = await authClient.signIn.email({
+      email: user.email,
+      password: user.password,
+      callbackURL: "/",
+    });
+    if (data) {
+      toast.success("সাইন ইন সফল হয়েছে।");
+    }
+    if (error) {
+      const message =
+        typeof error === "string"
+          ? error
+          : error?.message || "সাইন ইন করতে সমস্যা হয়েছে।";
+      toast.error(message);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleForgetPassword = () => {
+    toast.info("Password reset functionality is coming soon!");
+  };
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#f2f5f3] p-4 font-sans sm:p-6">
       <div className="mb-6 w-full max-w-md text-center">
@@ -21,12 +50,7 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <form onSubmit={onSubmit} className="space-y-4">
           <div>
             <label
               className="mb-1.5 block text-sm font-medium text-gray-800"
@@ -53,12 +77,13 @@ export default function LoginPage() {
               >
                 পাসওয়ার্ড
               </label>
-              <Link
-                href="/"
+              <button
+                type="button"
+                onClick={handleForgetPassword}
                 className="text-xs font-medium text-[#108a3d] hover:underline"
               >
                 পাসওয়ার্ড ভুলে গেছেন?
-              </Link>
+              </button>
             </div>
 
             <div className="relative">
@@ -98,32 +123,8 @@ export default function LoginPage() {
           <div className="grow border-t border-gray-200" />
         </div>
 
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-          >
-            <FcGoogle size={18} />
-            Google দিয়ে চালিয়ে যান
-          </button>
-
-          <div className="flex gap-4">
-            <button
-              type="button"
-              className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-            >
-              <FiGithub size={18} />
-              GitHub
-            </button>
-
-            <button
-              type="button"
-              className="flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-300 bg-white py-2.5 text-sm font-medium text-gray-700 outline-none transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-200"
-            >
-              <FaFacebook size={18} color="#1877F2" />
-              Facebook
-            </button>
-          </div>
+        <div>
+          <SocialProvider />
         </div>
 
         <div className="mt-8 text-center">

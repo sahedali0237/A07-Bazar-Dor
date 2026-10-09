@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { Suspense } from "react";
 
 import { connection } from "next/server";
+import UserData from "./userData";
 
 const CurrentDate = async () => {
   await connection();
@@ -41,21 +42,9 @@ const HeaderSection = () => {
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
-  <Link
-    href="/signIn"
-    className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition duration-300 hover:border-blue-600 hover:text-blue-600"
-  >
-    Sign In
-  </Link>
-
-  <Link
-    href="/signUp"
-    className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-300 hover:bg-blue-700 hover:shadow-md"
-  >
-    Sign Up
-  </Link>
-</div>
+        <div>
+          <UserData />
+        </div>
       </div>
     </header>
   );
