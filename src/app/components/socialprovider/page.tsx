@@ -1,5 +1,6 @@
-import React from "react";
+"use client";
 
+import React from "react";
 import { authClient } from "@/lib/auth-client";
 import { FcGoogle } from "react-icons/fc";
 import { FiGithub } from "react-icons/fi";
