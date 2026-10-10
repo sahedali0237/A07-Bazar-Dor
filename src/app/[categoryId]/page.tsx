@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { notFound } from "next/navigation";
 import SortDropdown from "../components/SortDropdown";
 
 interface Market {
@@ -23,6 +24,13 @@ interface Product {
   markets?: Market[];
 }
 
+interface Category {
+  id: string;
+  slug: string;
+  nameBn: string;
+  icon: string;
+}
+
 interface PageProps {
   params: Promise<{
     categoryId: string;
@@ -36,8 +44,29 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
   const { categoryId } = await params;
   const { sort } = await searchParams;
 
+  const categoryRes = await fetch(
+    "https://api.api-store.workers.dev/api/bazardor/categories",
+    {
+      next: { revalidate: 10 },
+    },
+  );
+
+  if (!categoryRes.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+
+  const categories: Category[] = await categoryRes.json();
+
+  const category = categories.find(
+    (item) => item.slug === categoryId || item.id === categoryId,
+  );
+
+  if (!category) {
+    notFound();
+  }
+
   const res = await fetch(
-    `https://api.api-store.workers.dev/api/bazardor/products?category=${categoryId}`,
+    `https://api.api-store.workers.dev/api/bazardor/products?category=${encodeURIComponent(category.slug)}`,
     {
       next: { revalidate: 10 },
     },
@@ -53,24 +82,19 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
     ? result
     : result.products || [];
 
-  // Copy array before sorting
   const sortedProducts = [...products];
 
-  // Low to High
   if (sort === "price-asc") {
     sortedProducts.sort((a, b) => Number(a.today) - Number(b.today));
   }
 
-  // High to Low
   if (sort === "price-desc") {
     sortedProducts.sort((a, b) => Number(b.today) - Number(a.today));
   }
 
-  const firstProduct = sortedProducts[0];
+  const categoryName = sortedProducts[0]?.categoryNameBn || category.nameBn;
 
-  const categoryName = firstProduct?.categoryNameBn || categoryId;
-
-  const categoryIcon = firstProduct?.categoryIcon || "🛒";
+  const categoryIcon = sortedProducts[0]?.categoryIcon || category.icon || "🛒";
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -109,7 +133,6 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
               key={product.id}
               className="overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md"
             >
-              {/* Product Information */}
               <div className="p-5">
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
@@ -128,7 +151,6 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
                     </div>
                   </div>
 
-                  {/* Price Change */}
                   <div
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${
                       product.change.dir === "up"
