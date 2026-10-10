@@ -66,6 +66,15 @@ async function ProductDetails({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  // 1. Move the auth check inside the Suspended component
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/signIn");
+  }
+
   const { slug } = await params;
 
   const res = await fetch(
@@ -304,14 +313,7 @@ export default async function DetailsPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/signIn");
-  }
-
+  // 2. The main page component is now entirely static, allowing the shell to prerender successfully.
   return (
     <main className="min-h-screen bg-[#f4f7f5] px-4 py-8 text-gray-800 md:px-8">
       <Suspense
