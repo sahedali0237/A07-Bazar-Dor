@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 import { Product, Market } from "@/types/page";
 
 const fetchProducts = async (): Promise<Product[]> => {
@@ -59,7 +61,6 @@ export async function generateMetadata({
   };
 }
 
-// 1. Extracted the data fetching and rendering into a separate async component
 async function ProductDetails({
   params,
 }: {
@@ -137,7 +138,6 @@ async function ProductDetails({
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      {/* Breadcrumb Section */}
       <nav className="text-sm font-medium text-gray-600">
         <Link href="/" className="hover:text-gray-900">
           হোম
@@ -148,7 +148,6 @@ async function ProductDetails({
         <span className="text-gray-900">{data.nameBn}</span>
       </nav>
 
-      {/* Main Header Card */}
       <div className="flex flex-col justify-between gap-6 rounded-2xl bg-white p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:flex-row md:items-center md:p-8">
         <div className="flex items-center gap-5 md:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#f4f7f5] text-4xl shadow-inner">
@@ -192,7 +191,6 @@ async function ProductDetails({
         </div>
       </div>
 
-      {/* Price Summary Section */}
       <section className="pt-2">
         <h2 className="mb-4 text-xl font-bold text-gray-800">
           দামের সারসংক্ষেপ
@@ -232,7 +230,6 @@ async function ProductDetails({
         </div>
       </section>
 
-      {/* Market Based Price Table */}
       {data.markets && data.markets.length > 0 && (
         <section className="pt-4 pb-12">
           <h2 className="mb-4 text-xl font-bold text-gray-800">
@@ -302,12 +299,19 @@ async function ProductDetails({
   );
 }
 
-// 2. The main page now wraps everything in Suspense
-export default function DetailsPage({
+export default async function DetailsPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/signIn");
+  }
+
   return (
     <main className="min-h-screen bg-[#f4f7f5] px-4 py-8 text-gray-800 md:px-8">
       <Suspense

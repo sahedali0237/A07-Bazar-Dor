@@ -96,7 +96,7 @@ const Profilepage = () => {
             Not Authenticated
           </h2>
           <button
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/signIn")}
             className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
           >
             Go to Login
@@ -110,7 +110,7 @@ const Profilepage = () => {
     <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         <div className="overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100">
-          <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600 sm:h-48"></div>
+          <div className="h-32 bg-linier-to-r from-blue-500 to-indigo-600 sm:h-48"></div>
 
           <div className="px-4 pb-8 sm:px-8">
             <div className="relative -mt-16 sm:-mt-24 flex justify-between items-end">
