@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { connection } from "next/server";
 import { Suspense } from "react";
+import SeeAllButton from "./SeeAllButton";
 
 const CurrentDate = async () => {
   await connection();
@@ -36,11 +37,8 @@ const Banner = () => {
             এক জায়গায়।
           </p>
 
-          <Link
-            href="/"
-            className="mt-5 inline-block rounded-md bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 md:text-base"
-          >
-            সব দাম দেখুন
+          <Link href="/">
+            <SeeAllButton />
           </Link>
         </div>
 
