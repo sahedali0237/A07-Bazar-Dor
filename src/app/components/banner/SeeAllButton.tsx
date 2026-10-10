@@ -1,4 +1,4 @@
-"use client"; // ONLY put this here
+"use client";
 
 import { toast } from "react-toastify";
 
