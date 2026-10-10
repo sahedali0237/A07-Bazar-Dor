@@ -19,7 +19,7 @@ const MarqueeSection = async () => {
 
   try {
     const res = await fetch(
-      "https://api.api-store.workers.dev/api/bazardor/products",
+      "https://openapi.programming-hero.com/api/bazardor/products",
       {
         next: { revalidate: 10 },
       },

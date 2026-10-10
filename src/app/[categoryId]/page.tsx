@@ -45,7 +45,7 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
   const { sort } = await searchParams;
 
   const categoryRes = await fetch(
-    "https://api.api-store.workers.dev/api/bazardor/categories",
+    "https://openapi.programming-hero.com/api/bazardor/categories",
     {
       next: { revalidate: 10 },
     },
@@ -66,7 +66,7 @@ const CategoryProducts = async ({ params, searchParams }: PageProps) => {
   }
 
   const res = await fetch(
-    `https://api.api-store.workers.dev/api/bazardor/products?category=${encodeURIComponent(category.slug)}`,
+    `https://openapi.programming-hero.com/api/bazardor/products?category=${encodeURIComponent(category.slug)}`,
     {
       next: { revalidate: 10 },
     },

@@ -9,7 +9,7 @@ import { Product, Market } from "@/types/page";
 const fetchProducts = async (): Promise<Product[]> => {
   try {
     const res = await fetch(
-      "https://api.api-store.workers.dev/api/bazardor/products",
+      "https://openapi.programming-hero.com/api/bazardor/products",
       {
         next: { revalidate: 10 },
       },
@@ -36,7 +36,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const res = await fetch(
-    "https://api.api-store.workers.dev/api/bazardor/products",
+    "https://openapi.programming-hero.com/api/bazardor/products",
     {
       next: { revalidate: 10 },
     },
@@ -78,7 +78,7 @@ async function ProductDetails({
   const { slug } = await params;
 
   const res = await fetch(
-    "https://api.api-store.workers.dev/api/bazardor/products",
+    "https://openapi.programming-hero.com/api/bazardor/products",
     {
       next: { revalidate: 10 },
     },
